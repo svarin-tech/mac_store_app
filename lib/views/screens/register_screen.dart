@@ -1,9 +1,40 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:mac_store_app/controllers/auth_controller.dart';
 import 'package:mac_store_app/views/screens/authentication_screens/login_screen.dart';
 
-class RegisterScreen extends StatelessWidget {
+class RegisterScreen extends StatefulWidget {
+  const RegisterScreen({super.key});
+
+  @override
+  State<RegisterScreen> createState() => _RegisterScreenState();
+}
+
+class _RegisterScreenState extends State<RegisterScreen> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final AuthController _authController = AuthController();
+  late String email;
+  late String fullName;
+  late String password;
+  bool _isLoading = false;
+  regiserUser() async {
+    setState(() {
+      _isLoading = true;
+    });
+    await _authController
+        .signUpUsers(
+          context: context,
+          email: email,
+          fullName: fullName,
+          password: password,
+        )
+        .whenComplete(() {
+          _formKey.currentState!.reset();
+          setState(() {
+            _isLoading = false;
+          });
+        });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -54,6 +85,9 @@ class RegisterScreen extends StatelessWidget {
                     ),
                   ),
                   TextFormField(
+                    onChanged: (value) {
+                      email = value;
+                    },
                     validator: (value) {
                       if (value!.isEmpty) {
                         return 'Enter your Email';
@@ -85,7 +119,7 @@ class RegisterScreen extends StatelessWidget {
                       ),
                     ),
                   ),
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                   Align(
                     alignment: AlignmentGeometry.topLeft,
                     child: Text(
@@ -98,6 +132,9 @@ class RegisterScreen extends StatelessWidget {
                     ),
                   ),
                   TextFormField(
+                    onChanged: (value) {
+                      fullName = value;
+                    },
                     validator: (value) {
                       if (value!.isEmpty) {
                         return 'Enter Your Full Name';
@@ -129,8 +166,11 @@ class RegisterScreen extends StatelessWidget {
                       ),
                     ),
                   ),
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                   TextFormField(
+                    onChanged: (value) {
+                      password = value;
+                    },
                     validator: (value) {
                       if (value!.isEmpty) {
                         return 'Enter your Password';
@@ -161,16 +201,17 @@ class RegisterScreen extends StatelessWidget {
                         ),
                       ),
 
-                      suffixIcon: Icon(Icons.visibility),
+                      suffixIcon: IconButton(
+                        onPressed: () {},
+                        icon: const Icon(Icons.visibility),
+                      ),
                     ),
                   ),
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                   InkWell(
                     onTap: () {
                       if (_formKey.currentState!.validate()) {
-                        debugPrint('Correct');
-                      } else {
-                        debugPrint('Failed');
+                        regiserUser();
                       }
                     },
                     child: Container(
@@ -237,21 +278,25 @@ class RegisterScreen extends StatelessWidget {
                             ),
                           ),
                           Center(
-                            child: Text(
-                              'Sign Up',
-                              style: GoogleFonts.getFont(
-                                'Lato',
-                                color: Colors.white,
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
+                            child: _isLoading
+                                ? const CircularProgressIndicator(
+                                    color: Colors.white,
+                                  )
+                                : Text(
+                                    'Sign Up',
+                                    style: GoogleFonts.getFont(
+                                      'Lato',
+                                      color: Colors.white,
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
                           ),
                         ],
                       ),
                     ),
                   ),
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
